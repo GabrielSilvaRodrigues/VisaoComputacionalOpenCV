@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OpenCV Studio — PyScript</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://pyscript.net/releases/2025.2.2/core.css" />
+  <script type="module" src="https://pyscript.net/releases/2025.2.2/core.js"></script>
+  <py-config>
+    packages = ["numpy", "opencv-python"]
+  </py-config>
+</head>
+<body>
+  <div class="app">
+    <header class="titlebar"><div class="traffic"><i></i><i></i><i></i></div><span>OpenCV Studio</span><span class="path">— editor.py</span><div class="title-actions"><button id="themeBtn">☾</button></div></header>
+    <div class="tabs"><button class="tab active" data-mode="gui">▣ Visual Editor</button><button class="tab" data-mode="code">{} editor.py</button><button class="tab" data-mode="help">? Help</button><div class="tab-spacer"></div><button id="runBtn" class="run">▶ Run Code</button><button id="copyBtn">⧉ Copy</button><button id="downloadBtn">⇩ Export</button></div>
+    <main class="workspace">
+      <aside class="activity"><button class="active" title="Editor">▤</button><button title="Image">◫</button><button title="Pipeline">⌘</button><button title="Models">◉</button><div class="activity-bottom"><button id="resetBtn">↺</button><button id="infoBtn">ⓘ</button></div></aside>
+      <aside class="sidebar">
+        <div class="side-head">EXPLORER <span>···</span></div>
+        <div class="section"><button class="accordion open">CORE & ARITHMETIC <b>⌄</b></button><div class="panel">
+          <label class="file">▸ Open image<input id="fileInput" type="file" accept="image/*" hidden></label>
+          <button id="newBtn">＋ New / Clear</button><button id="saveBtn">⇩ Save image</button>
+          <label>Alpha <output id="alphaOut">1.00</output><input id="alpha" type="range" min="0" max="3" step="0.01" value="1"></label>
+          <label>Beta <output id="betaOut">0</output><input id="beta" type="range" min="-150" max="150" step="1" value="0"></label>
+          <label>Gamma <output id="gammaOut">1.00</output><input id="gamma" type="range" min="0.1" max="3" step="0.01" value="1"></label>
+          <label>Blend weight <output id="blendOut">0.50</output><input id="blend" type="range" min="0" max="1" step="0.01" value="0.5"></label>
+        </div></div>
+        <div class="section"><button class="accordion">BLURRING <b>›</b></button><div class="panel hidden">
+          <select id="blur"><option value="none">None</option><option value="gaussian">Gaussian</option><option value="median">Median</option><option value="bilateral">Bilateral</option></select>
+          <label>Kernel <output id="kernelOut">3</output><input id="kernel" type="range" min="3" max="21" step="2" value="3"></label>
+          <label>Sigma X <output id="sxOut">0</output><input id="sigmaX" type="range" min="0" max="20" step="0.5" value="0"></label>
+          <label>Sigma Y <output id="syOut">0</output><input id="sigmaY" type="range" min="0" max="20" step="0.5" value="0"></label>
+          <label>Bilateral d <output id="bdOut">7</output><input id="bd" type="range" min="1" max="31" step="2" value="7"></label>
+          <label>Sigma Color <output id="scOut">75</output><input id="sc" type="range" min="1" max="200" step="1" value="75"></label>
+          <label>Sigma Space <output id="ssOut">75</output><input id="ss" type="range" min="1" max="200" step="1" value="75"></label>
+        </div></div>
+        <div class="section"><button class="accordion">MORPHOLOGY <b>›</b></button><div class="panel hidden">
+          <select id="morph"><option value="none">None</option><option value="erode">Erode</option><option value="dilate">Dilate</option><option value="open">Opening</option><option value="close">Closing</option><option value="blackhat">Black Hat</option></select>
+          <label>Element size <output id="morphKOut">3</output><input id="morphK" type="range" min="1" max="21" step="2" value="3"></label>
+          <label>Iterations <output id="iterOut">1</output><input id="iter" type="range" min="1" max="10" step="1" value="1"></label>
+        </div></div>
+        <div class="section"><button class="accordion">THRESHOLDING <b>›</b></button><div class="panel hidden">
+          <select id="thresholdMode"><option value="none">None</option><option value="binary">Binary</option><option value="otsu">Otsu</option><option value="adaptive">Adaptive Gaussian</option></select>
+          <label>Threshold <output id="thOut">127</output><input id="th" type="range" min="0" max="255" value="127"></label>
+          <label>Max value <output id="maxOut">255</output><input id="maxv" type="range" min="1" max="255" value="255"></label>
+          <label>Block size <output id="blockOut">11</output><input id="block" type="range" min="3" max="51" step="2" value="11"></label>
+          <label>Constant C <output id="cOut">2</output><input id="cval" type="range" min="-20" max="20" value="2"></label>
+        </div></div>
+        <div class="section"><button class="accordion">EDGES / LINES / CONTOURS <b>›</b></button><div class="panel hidden">
+          <select id="edge"><option value="none">None</option><option value="canny">Canny</option><option value="sobel">Sobel</option><option value="scharr">Scharr</option><option value="hough">Hough Lines P</option><option value="circles">Hough Circles</option></select>
+          <label>Canny 1 <output id="c1Out">80</output><input id="c1" type="range" min="0" max="500" value="80"></label>
+          <label>Canny 2 <output id="c2Out">160</output><input id="c2" type="range" min="0" max="500" value="160"></label>
+          <label>Sobel kernel <output id="sobelKOut">3</output><input id="sobelK" type="range" min="1" max="7" step="2" value="3"></label>
+          <label>Hough threshold <output id="htOut">50</output><input id="ht" type="range" min="1" max="200" value="50"></label>
+          <label>Min line length <output id="hminOut">50</output><input id="hmin" type="range" min="1" max="500" value="50"></label>
+          <label>Max line gap <output id="hgapOut">10</output><input id="hgap" type="range" min="1" max="200" value="10"></label>
+          <label>Circle min radius <output id="rminOut">0</output><input id="rmin" type="range" min="0" max="500" value="0"></label>
+          <label>Circle max radius <output id="rmaxOut">0</output><input id="rmax" type="range" min="0" max="800" value="0"></label>
+        </div></div>
+        <div class="section"><button class="accordion">NOISE / RESTORATION <b>›</b></button><div class="panel hidden">
+          <label>Gaussian noise <output id="noiseOut">0</output><input id="noise" type="range" min="0" max="60" value="0"></label>
+          <label>Denoise h <output id="dhOut">0</output><input id="dh" type="range" min="0" max="30" value="0"></label>
+          <label>Denoise hColor <output id="dhcOut">0</output><input id="dhc" type="range" min="0" max="30" value="0"></label>
+        </div></div>
+        <div class="section"><button class="accordion">HSV / CHANNELS <b>›</b></button><div class="panel hidden">
+          <label>Hue min <output id="hueMinOut">0</output><input id="hueMin" type="range" min="0" max="179" value="0"></label>
+          <label>Hue max <output id="hueMaxOut">179</output><input id="hueMax" type="range" min="0" max="179" value="179"></label>
+          <label>Sat min <output id="satMinOut">0</output><input id="satMin" type="range" min="0" max="255" value="0"></label>
+          <label>Sat max <output id="satMaxOut">255</output><input id="satMax" type="range" min="0" max="255" value="255"></label>
+          <label>Value min <output id="valMinOut">0</output><input id="valMin" type="range" min="0" max="255" value="0"></label>
+          <label>Value max <output id="valMaxOut">255</output><input id="valMax" type="range" min="0" max="255" value="255"></label>
+        </div></div>
+        <div class="section"><button class="accordion">GEOMETRY <b>›</b></button><div class="panel hidden">
+          <label>Rotation <output id="angleOut">0°</output><input id="angle" type="range" min="-180" max="180" value="0"></label>
+          <label>Scale <output id="scaleOut">1.0×</output><input id="scale" type="range" min="0.1" max="5" step="0.1" value="1"></label>
+          <label>Translate X <output id="txOut">0</output><input id="tx" type="range" min="-1000" max="1000" value="0"></label>
+          <label>Translate Y <output id="tyOut">0</output><input id="ty" type="range" min="-1000" max="1000" value="0"></label>
+        </div></div>
+        <div class="section"><button class="accordion">VISION / AI MODELS <b>›</b></button><div class="panel hidden">
+          <label class="file">▸ Haar Cascade XML<input id="cascadeInput" type="file" accept=".xml" hidden></label>
+          <label>Scale factor <output id="sfOut">1.10</output><input id="sf" type="range" min="1.01" max="2" step="0.01" value="1.1"></label>
+          <label>Min neighbors <output id="mnOut">5</output><input id="mn" type="range" min="1" max="20" value="5"></label>
+          <label class="file">▸ DNN model<input id="modelInput" type="file" accept=".onnx,.pb,.caffemodel,.prototxt" hidden></label>
+          <label>Confidence <output id="confOut">50%</output><input id="conf" type="range" min="0" max="100" value="50"></label>
+          <label>NMS threshold <output id="nmsOut">45%</output><input id="nms" type="range" min="0" max="100" value="45"></label>
+          <div class="checks"><label><input id="faceMode" type="checkbox"> Enable Haar detection</label><label><input id="dnnMode" type="checkbox"> Enable DNN placeholder</label></div>
+        </div></div>
+      </aside>
+      <section class="center">
+        <div class="breadcrumb">OpenCV Studio <span>›</span> <b>workspace</b> <span>›</span> editor</div>
+        <div class="editor-tabs"><span class="filetab active">● image.png</span><span class="filetab">⚙ pipeline.json</span></div>
+        <div id="guiView" class="gui-view">
+          <div class="canvas-wrap"><canvas id="canvas"></canvas><div id="dropHint"><strong>Drop an image here</strong><small>or use Explorer → Open image</small></div></div>
+          <div class="pipeline"><div class="pipe-head"><span>PIPELINE</span><button id="clearPipe">Clear</button></div><div id="pipeList" class="pipe-list"><span class="empty">No operations yet</span></div></div>
+        </div>
+        <div id="codeView" class="code-view hidden"><div class="line-numbers" id="lineNumbers">1</div><textarea id="codeEditor" spellcheck="false"></textarea></div>
+        <div id="helpView" class="help-view hidden"><h2>OpenCV Studio</h2><p>Edite imagens no navegador com <b>PyScript + Pyodide + cv2</b>. O processamento ocorre localmente no browser.</p><ul><li>Abra uma imagem e ajuste os módulos.</li><li>Troque para <b>editor.py</b> para editar o código.</li><li>Use <b>Run Code</b> para executar Python/cv2.</li><li>Modelos Haar/DNN são carregados pelo usuário e permanecem no navegador.</li></ul></div>
+        <footer><span id="status">● Ready</span><span>Python <b>Pyodide</b> · OpenCV <b id="cvVer">loading…</b></span><span>Ln 1, Col 1</span></footer>
+      </section>
+    </main>
+  </div>
+  <script src="app.js"></script>
+  <script type="py" src="app.py"></script>
+</body>
+</html>
